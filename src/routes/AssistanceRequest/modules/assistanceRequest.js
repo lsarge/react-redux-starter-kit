@@ -10,33 +10,12 @@ export const FETCH_SERVICES_REQUEST = 'FETCH_SERVICES_REQUEST';
 export const FETCH_SERVICES_SUCCESS = 'FETCH_SERVICES_SUCCESS';
 export const FETCH_SERVICES_ERROR = 'FETCH_SERVICES_ERROR';
 
+export const FORM_SUBMISSION_REQUEST = 'FORM_SUBMISSION_REQUEST';
+export const FORM_SUBMISSION_SUCCESS = 'FORM_SUBMISSION_SUCCESS';
+export const FORM_SUBMISSION_ERROR = 'FORM_SUBMISSION_SUCCESS';
 // ------------------------------------
 // Actions
 // ------------------------------------
-export function increment (value = 1) {
-  return {
-    type    : COUNTER_INCREMENT,
-    payload : value
-  };
-}
-
-/*  This is a thunk, meaning it is a function that immediately
-    returns a function for lazy evaluation. It is incredibly useful for
-    creating async actions, especially when combined with redux-thunk! */
-
-export const doubleAsync = () => {
-  return (dispatch, getState) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        dispatch({
-          type    : COUNTER_DOUBLE_ASYNC,
-          payload : getState().assistanceRequest
-        });
-        resolve();
-      }, 200);
-    });
-  };
-};
 
 export const fetchServiceTypes = () => {
   return (dispatch, getState) => {
@@ -47,6 +26,15 @@ export const fetchServiceTypes = () => {
       .catch(error => dispatch(fetchError(error)));
   };
 };
+
+export const postAssistanceRequest = (data)  => {
+  console.log('data', data);
+  debugger;
+  return (dispatch) => {
+    dispatch(submitRequest());
+    api.postAssistanceRequest(data)
+  }
+}
 
 export const normalize = (response) => {
   const data = response.data;
@@ -70,6 +58,9 @@ export const normalize = (response) => {
   return normalized;
 };
 
+// ------------------------------------
+// service type requests
+// ------------------------------------
 export const fetchRequest = () => (
   {
     type: FETCH_SERVICES_REQUEST,
@@ -90,31 +81,75 @@ export const fetchError = (error) => {
   };
 };
 
+
+// ------------------------------------
+// form submission
+// ------------------------------------
+
+export const submitRequest = () => (
+  {
+    type: FORM_SUBMISSION_REQUEST
+  }
+)
+
+export const submitSuccess = (response) => {
+  return {
+    type: FORM_SUBMISSION_SUCCESS,
+    payload: response,
+  };
+}
+
+export const submitError = (error) => {
+  return {
+    type: FORM_SUBMISSION_ERROR,
+    error,
+  };
+};
+
+
 export const actions = {
   fetchServiceTypes,
-  increment,
-  doubleAsync
+  postAssistanceRequest,
 };
 
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [COUNTER_INCREMENT]    : (state, action) => state + action.payload,
-  [COUNTER_DOUBLE_ASYNC] : (state, action) => state * 2,
-  [FETCH_SERVICES_SUCCESS]: (state, action) => {
-    return { ...state, serviceTypes: action.payload };
-  }
+  [FETCH_SERVICES_REQUEST]: (state, action) => ({
+    ...state,
+    isFetching: true,
+  }),
+  [FETCH_SERVICES_SUCCESS]: (state, action) => ({
+    ...state,
+    serviceTypes: action.payload,
+    isFetching: false,
+  }),
+  [FETCH_SERVICES_ERROR]: (state, action) => ({
+    ...state,
+    error: action.error
+  })
 };
 
 // ------------------------------------
 // Reducer
 // ------------------------------------
-const initialState = [];
-export default function assistanceReducer (state = initialState, action) {
+const initialState = {
+  request: {
+    firstName: '',
+    lastName: '',
+    email: '',
+    body: '',
+    serviceType: '',
+  },
+  isFetching: false,
+  serviceTypes: [],
+};
+export default function assistanceReducer(state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type];
 
   return handler ? handler(state, action) : state;
 }
 
+export const selectRequest = state => state.assistanceRequest.request;
 export const selectServiceTypes = state => state.assistanceRequest.serviceTypes;

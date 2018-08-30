@@ -2,7 +2,7 @@ const chalk = require('chalk');
 const figures = require('figures');
 
 // Need to support Node versions that don't support spreading function arguments
-const spread = (fn) => function () {
+const spread = (fn) => function() {
   return fn([].slice.call(arguments));
 };
 
