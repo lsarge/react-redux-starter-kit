@@ -1,23 +1,23 @@
 import React from 'react';
+import './RenderTextArea.scss';
 
-const textAreaStyle = {
-  resize: 'none',
-}
-
-export const RenderTextArea = (field) => {
-  const style = {
-    ...field.style,
-    ...textAreaStyle
-  }
-
-  return (
+export const RenderTextArea = (field) => (
+  <div>
     <textarea
       {...field.input}
-      style={style}
-      className="form-control"
-      rows="5">
-    </textarea>
-  );
-};
+      className="form-control text-area"
+      placeholder={field.placeholder}
+      rows="5" />
+    {
+      field.meta.touched
+      && field.meta.error
+      && (
+      <span className="error-text">
+        {field.meta.error}
+      </span>
+        )
+      }
+  </div>
+);
 
 export default RenderTextArea;
