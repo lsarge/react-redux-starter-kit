@@ -17,7 +17,7 @@ const middlewares = [thunk];
 const mockStore = configureMockStore(middlewares);
 
 describe('(Redux Module) AssistanceRequest', () => {
-  describe('(Action Creator) doubleAsync', () => {
+  describe('(Action Creator) fetchServiceTypes', () => {
     let _globalState;
     let _dispatchSpy;
 
